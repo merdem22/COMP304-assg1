@@ -16,16 +16,29 @@ int main(int argc, char *argv[])
 	
 
 	int x = atoi(argv[1]);
-	int pid; //this variable will store the process id.
+	int parent_id = getpid();
+	int pid;
+	int i = 0;
+	int level = 0; 
+	
+	printf("Main Process ID: %d, level: %d\n", parent_id, level);
 
-	while (x > 0)
-	{	
+	for (int i = 0; i < x; i++)
+	{
 		
-		fork();
-		pid = getpid();
-		printf("The process id is: %d\n", pid);
-		x--;
+		parent_id = getpid(); //we can get the parent id as the current process before calling fork will be the parent.
+		int val = fork(); //create a child process here, anything below will be run concurrently with parent.
+		if (val == 0) //we want to update the level only if we are in a child process.
+		{
+			level++;
+		}
+		
 	}
-
+	pid = getpid();
+	if (level > 0)
+	{
+		printf("Process ID: %d, Parent ID: %d, Level: %d\n",pid, parent_id, level);
+	}
+	
 	return 0;
 }
