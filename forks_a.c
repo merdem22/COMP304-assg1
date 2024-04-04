@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
 		
 	if (argc != 2)//ensure command line arguments are entered properly.
 	{
-		printf("Please enter a single number as a command line argument to determine how many child processes will be created.");
+		printf("Please enter a single number as an argument to denote the number of iterations.");
 		return 1;
 	}
 	
