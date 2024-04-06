@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
-
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/stat.h>
 
 int main(int argc, char *argv[])
 {
@@ -22,25 +24,39 @@ int main(int argc, char *argv[])
 
 	for (int i = 0; i < n; i++)
 	{
+		gettimeofday(&start_time, NULL); //start the chronometer.
 		val = fork();
 		if (val == 0)
-		{	
-			gettimeofday(&start_time, NULL);
+		{	//forwarding to dev/null
+			int null_fd = open("/dev/null", O_WRONLY);
+			if(dup2(null_fd, STDOUT_FILENO) == -1)
+			{
+				perror("dup");
+				exit(NULL);
+			}
+			close(null_fd);
+
+
+
 			execvp(command_name, (char *)NULL); //runs the command specified with no arguments.
-			gettimeofday(&end_time, NULL);
-			
-			duration = (double)(end_time.tv_sec - start_time.tv_sec) * 1000.0 + (double)(end_time.tv_usec - start_time.tv_usec) / 1000.0;
-			printf("Child executed in %lf seconds.");
-			exit(NULL);
+			exit(NULL);//since the child exits after execution, they won't be able to create processes themselves.
+
 		}
 		else
 		{
-			wait();//wait for child to finish.
-		}		
-			 
-
+			wait();//the parent will wait for its children to finish.
+		}
+		gettimeofday(&end_time, NULL);//stop the chronometer.
+		duration = (double)(end_time.tv_sec - start_time.tv_sec) * 1000.0 + (double)(end_time.tv_usec - start_time.tv_usec) / 1000.0;
+		durations[i] = duration;
+				
+			
 	}
 
+	for (int i = 0; i < n; i++)
+	{
+		printf("It took process %d, %lf miliseconds.\n", i, durations[i]);
+	}
 
 
 
