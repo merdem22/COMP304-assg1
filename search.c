@@ -16,7 +16,7 @@ int main()
 		while(getchar() != '\n');
 
 	}
-
+	//print the numbers.
 	for (int i = 0; i < MAX_NUMBERS; i++)
 	{
 		printf("%d", numbers[i]); //print the numbers for debugging.
