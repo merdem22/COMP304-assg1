@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <sys/wait.h>
 
 #define MAX_NUMBERS 1000
 
@@ -7,7 +9,7 @@
 int main(int argc, char* argv[])
 {
 	int numbers[MAX_NUMBERS];
-	int num_count = 0;
+	int numCount = 0;
 
 
 	if (argc != 3)
@@ -19,43 +21,52 @@ int main(int argc, char* argv[])
 
 
 	//assign numbers to array from stdin.
-	while (num_count < MAX_NUMBERS && scanf("%d", &numbers[num_count]) == 1)
+	while (numCount < MAX_NUMBERS && scanf("%d", &numbers[numCount]) == 1)
 	{
-		num_count++;
+		numCount++;
 		while(getchar() != '\n');
 
 	}
 	
-
-	int x = argv[1];
-	int processNum = argv[2];
-
-	int arraySize = MAX_NUMBERS/processNum;
+	int x = atoi(argv[1]);
+	int processCount = atoi(argv[2]);
+	int portionSize = numCount/processCount;
+	int remainder = numCount % processCount;
 	
-	
-	for (int i = 0;	i < processNum; i++)
+	for (int i = 0;	i < processCount; i++)
 	{
 		int val = fork();
 		if (val == 0)
 		{	
 			//search the array.
-			int startIndex = arraySize * i;
-			int endIndex = arraySize * (i+1);
+			int startIndex = portionSize * i;
+			int endIndex;
+			if (i == processCount - 1) //managing the windows borders.
+			{
+				endIndex = numCount;
+			}
+			else
+			{	endIndex = startIndex + portionSize + (i < remainder ? 1 : 0); 
+			}
 			for (int j = startIndex; j < endIndex; j++)
 			{
 				if (numbers[j] == x)
 				{
-					printf("X found.");
+					printf("X found.\n");
 					exit(0);
 				}
+			
 			}
+			//not found
+			printf("Not found, for process %d\n", i+1);
 			exit(1);
 		}
-		else
-		{	//parent waits for children.
-			wait();
-		}
 	}
+
+	wait(NULL); //wait for children
+	
+	//kill(0, SIGKILL); //kill all remaining children. 
+
 
 	
 	return 0;
