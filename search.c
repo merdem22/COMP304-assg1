@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
 			waitpid(childrenPIDS[i], &status, 0); //wait for the current child to finish.
 			if (WIFEXITED(status) && WEXITSTATUS(status) == 0) //if the process exits with code 0.
 			{
-				for (int j = 0; j < i+1; j++)//kill the children processes.
+				for (int j = 0; j < i+1; j++)//kill the remaining processes.
 				{
 					if (j!=i)
 					{
